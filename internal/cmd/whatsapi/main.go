@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	_ "github.com/mattn/go-sqlite3" // Import SQLite driver
 	"go.uber.org/zap"
@@ -14,26 +13,22 @@ import (
 )
 
 func main() {
-
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		fmt.Println("Error loading config: ", err)
+		panic(fmt.Sprintf("Failed to load config: %v", err))
 	}
 
-	logger := logger.Init(cfg)
-	defer logger.Logger.Sync()
+	log := logger.InitLogger(cfg)
+	defer log.Logger.Sync()
 
 	var client whatisapiInterface.WhatsInterface
 	client, err = adapter.NewWhatsClient(cfg)
 	if err != nil {
-		logger.Logger.Error("Error creating new client", zap.Error(err))
+		log.Logger.Error("Failed to create client", zap.Error(err))
 	}
-
 	client.AddEventHandler(adapter.EventHandler)
-
 	if err := client.Start(); err != nil {
-		log.Fatal(err)
+		log.Logger.Error("Failed to start client", zap.Error(err))
 	}
-
 	select {}
 }

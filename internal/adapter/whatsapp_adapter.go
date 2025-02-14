@@ -11,28 +11,31 @@ import (
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/store/sqlstore"
 	"go.mau.fi/whatsmeow/types/events"
-	waLog "go.mau.fi/whatsmeow/util/log"
+	"go.uber.org/zap"
 )
+
+var log = logger.GetLogger()
 
 type WhatsClient struct {
 	client *whatsmeow.Client
 }
 
 func NewWhatsClient(cfg *config.Config) (*WhatsClient, error) {
-	logger := logger.Init(cfg)
-	defer logger.Logger.Sync()
-	dbLog := waLog.Stdout("Database", "DEBUG", true)
-	container, err := sqlstore.New(cfg.Cache.Storage, cfg.Cache.File, dbLog)
+	log.Logger.Info("Creating new client")
+	container, err := sqlstore.New(cfg.Cache.Storage, cfg.Cache.File, nil)
 	if err != nil {
-		logger.Logger.Error("Starting application")
-		return nil, fmt.Errorf("failed to create storage container: %w", err)
+		log.Logger.Fatal("Failed to create container", zap.Error(err))
 	}
 	deviceStore, err := container.GetFirstDevice()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get device: %w", err)
+		log.Logger.Fatal("Failed to Get Devicer", zap.Error(err))
 	}
-	clientLog := waLog.Stdout("Client", "DEBUG", true)
-	client := whatsmeow.NewClient(deviceStore, clientLog)
+
+	client := whatsmeow.NewClient(deviceStore, nil)
+	if client == nil {
+		log.Logger.Fatal("Failed to load store", zap.Error(err))
+	}
+
 	return &WhatsClient{client: client}, nil
 }
 
@@ -40,10 +43,10 @@ func (c *WhatsClient) Start() error {
 	if c.client.Store.ID == nil {
 		channel, err := c.QRChannel()
 		if err != nil {
-			return fmt.Errorf("failed to get QR channel: %w", err)
+			log.Logger.Fatal("Failed to get QR channel", zap.Error(err))
 		}
 		if err := c.Connect(); err != nil {
-			return err
+			log.Logger.Fatal("Failed to connect", zap.Error(err))
 		}
 		c.QRCode(channel)
 		return nil
@@ -83,7 +86,7 @@ func (c *WhatsClient) QRCode(qrChan <-chan whatsmeow.QRChannelItem) string {
 
 func (c *WhatsClient) Connect() error {
 	if err := c.client.Connect(); err != nil {
-		return fmt.Errorf("failed to connect: %w", err)
+		log.Logger.Fatal("Failed to connect", zap.Error(err))
 	}
 	return nil
 }
