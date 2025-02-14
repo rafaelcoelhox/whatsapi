@@ -5,12 +5,16 @@ import (
 
 	_ "github.com/mattn/go-sqlite3" // Import SQLite driver
 
+	"github.com/rafaelcoelhox/whatsapi/helper/logger"
 	"github.com/rafaelcoelhox/whatsapi/internal/adapter"
 	"github.com/rafaelcoelhox/whatsapi/internal/config"
 	whatisapiInterface "github.com/rafaelcoelhox/whatsapi/internal/interface"
 )
 
 func main() {
+
+	logger.Init()
+	defer logger.Sync()
 
 	cfg, err := config.LoadConfig()
 	if err != nil {

@@ -7,6 +7,7 @@ require (
 	github.com/mdp/qrterminal/v3 v3.2.0
 	github.com/spf13/viper v1.19.0
 	go.mau.fi/whatsmeow v0.0.0-20250212143635-53482eea9bc9
+	go.uber.org/zap v1.21.0
 )
 
 require (
