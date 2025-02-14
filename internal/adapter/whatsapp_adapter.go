@@ -19,25 +19,20 @@ type WhatsClient struct {
 }
 
 func NewWhatsClient(cfg *config.Config) (*WhatsClient, error) {
-
 	logger := logger.Init(cfg)
 	defer logger.Logger.Sync()
-
 	dbLog := waLog.Stdout("Database", "DEBUG", true)
 	container, err := sqlstore.New(cfg.Cache.Storage, cfg.Cache.File, dbLog)
 	if err != nil {
 		logger.Logger.Error("Starting application")
 		return nil, fmt.Errorf("failed to create storage container: %w", err)
 	}
-
 	deviceStore, err := container.GetFirstDevice()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get device: %w", err)
 	}
-
 	clientLog := waLog.Stdout("Client", "DEBUG", true)
 	client := whatsmeow.NewClient(deviceStore, clientLog)
-
 	return &WhatsClient{client: client}, nil
 }
 
@@ -47,15 +42,12 @@ func (c *WhatsClient) Start() error {
 		if err != nil {
 			return fmt.Errorf("failed to get QR channel: %w", err)
 		}
-
 		if err := c.Connect(); err != nil {
 			return err
 		}
-
 		c.QRCode(channel)
 		return nil
 	}
-
 	fmt.Println("Already authenticated")
 	return c.Connect()
 }
