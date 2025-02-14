@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/mdp/qrterminal/v3"
+	logger "github.com/rafaelcoelhox/whatsapi/helper"
 	"github.com/rafaelcoelhox/whatsapi/internal/config"
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/store/sqlstore"
@@ -18,9 +19,14 @@ type WhatsClient struct {
 }
 
 func NewWhatsClient(cfg *config.Config) (*WhatsClient, error) {
+
+	logger := logger.Init(cfg)
+	defer logger.Logger.Sync()
+
 	dbLog := waLog.Stdout("Database", "DEBUG", true)
 	container, err := sqlstore.New(cfg.Cache.Storage, cfg.Cache.File, dbLog)
 	if err != nil {
+		logger.Logger.Error("Starting application")
 		return nil, fmt.Errorf("failed to create storage container: %w", err)
 	}
 

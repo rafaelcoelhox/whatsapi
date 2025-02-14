@@ -7,4 +7,7 @@ database:
   password: secret
 cache:
   file: file:../../cache/whatsapicache.db?_foreign_keys=on
-  storage: sqlite3
+  storage: sqlite33
+appenv: 
+  env: development
+  logfile: whatsapi.logs

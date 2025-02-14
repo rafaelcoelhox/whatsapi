@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3" // Import SQLite driver
+	"go.uber.org/zap"
 
-	"github.com/rafaelcoelhox/whatsapi/helper/logger"
+	logger "github.com/rafaelcoelhox/whatsapi/helper"
 	"github.com/rafaelcoelhox/whatsapi/internal/adapter"
 	"github.com/rafaelcoelhox/whatsapi/internal/config"
 	whatisapiInterface "github.com/rafaelcoelhox/whatsapi/internal/interface"
@@ -13,18 +15,18 @@ import (
 
 func main() {
 
-	logger.Init()
-	defer logger.Sync()
-
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Fatalf("Erro ao carregar configuração: %v", err)
+		fmt.Println("Error loading config: ", err)
 	}
+
+	logger := logger.Init(cfg)
+	defer logger.Logger.Sync()
 
 	var client whatisapiInterface.WhatsInterface
 	client, err = adapter.NewWhatsClient(cfg)
 	if err != nil {
-		log.Fatalf("Error creating WhatsClient: %v", err)
+		logger.Logger.Error("Error creating new client", zap.Error(err))
 	}
 
 	client.AddEventHandler(adapter.EventHandler)
