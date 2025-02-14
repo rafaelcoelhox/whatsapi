@@ -1,0 +1,10 @@
+app:
+  name: whatsapi
+  port: 8080
+database:
+  host: localhost
+  user: admin
+  password: secret
+cache:
+  file: file:../../cache/whatsapicache.db?_foreign_keys=on
+  storage: sqlite3
