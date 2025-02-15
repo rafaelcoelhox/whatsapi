@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	_ "github.com/mattn/go-sqlite3" // Import the SQLite3 driver
 	"github.com/mdp/qrterminal/v3"
 	logger "github.com/rafaelcoelhox/whatsapi/helper"
 	"github.com/rafaelcoelhox/whatsapi/internal/config"
@@ -14,13 +15,12 @@ import (
 	"go.uber.org/zap"
 )
 
-var log = logger.GetLogger()
-
 type WhatsClient struct {
 	client *whatsmeow.Client
 }
 
 func NewWhatsClient(cfg *config.Config) (*WhatsClient, error) {
+	log := logger.GetLogger()
 	log.Logger.Info("Creating new client")
 	container, err := sqlstore.New(cfg.Cache.Storage, cfg.Cache.File, nil)
 	if err != nil {
@@ -39,6 +39,7 @@ func NewWhatsClient(cfg *config.Config) (*WhatsClient, error) {
 }
 
 func (c *WhatsClient) Start() error {
+	log := logger.GetLogger()
 	if c.client.Store.ID == nil {
 		channel, err := c.QRChannel()
 		if err != nil {
@@ -47,10 +48,9 @@ func (c *WhatsClient) Start() error {
 		if err := c.Connect(); err != nil {
 			log.Logger.Fatal("Failed to connect", zap.Error(err))
 		}
+		log.Logger.Info("Waiting for QR code")
 		c.QRCode(channel)
-		return nil
 	}
-	fmt.Println("Already authenticated")
 	return c.Connect()
 }
 
@@ -70,11 +70,11 @@ func (c *WhatsClient) QRCode(qrChan <-chan whatsmeow.QRChannelItem) string {
 	for evt := range qrChan {
 		if evt.Event == "code" {
 			config := qrterminal.Config{
-				Level:     qrterminal.M,
+				Level:     qrterminal.L, // Reduz a densidade do QR Code
 				Writer:    os.Stdout,
 				BlackChar: qrterminal.BLACK,
 				WhiteChar: qrterminal.WHITE,
-				QuietZone: 2,
+				QuietZone: 0, // Ajuste para melhorar a legibilidade
 			}
 			qrterminal.GenerateWithConfig(evt.Code, config)
 			return evt.Code
@@ -84,9 +84,12 @@ func (c *WhatsClient) QRCode(qrChan <-chan whatsmeow.QRChannelItem) string {
 }
 
 func (c *WhatsClient) Connect() error {
+	log := logger.GetLogger()
 	if err := c.client.Connect(); err != nil {
-		log.Logger.Fatal("Failed to connect", zap.Error(err))
+		log.Logger.Error("Failed to connect", zap.Error(err))
 	}
+	// Listen to Ctrl+C (you can also do something else that prevents the program from exiting)
+
 	return nil
 }
 

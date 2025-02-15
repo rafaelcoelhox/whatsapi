@@ -1,9 +1,10 @@
 package logger
 
 import (
+	"fmt"
 	"os"
 	"sync"
-	"fmt"
+
 	"github.com/rafaelcoelhox/whatsapi/internal/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -11,7 +12,7 @@ import (
 
 var (
 	globalLogger *Logger
-	once sync.Once
+	once         sync.Once
 )
 
 type Logger struct {
@@ -27,7 +28,8 @@ func InitLogger(cfg *config.Config) *Logger {
 }
 func GetLogger() *Logger {
 	if globalLogger == nil {
-		panic("Logger not initialized")
+		fmt.Errorf("Logger not initialized", globalLogger)
+		return nil
 	}
 	return globalLogger
 }

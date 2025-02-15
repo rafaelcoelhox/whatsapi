@@ -6,7 +6,7 @@ database:
   user: admin
   password: secret
 cache:
-  file: file:../../cache/whatsapicache.db?_foreign_keys=on
+  file: file:internal/cache/whatsapicache.db?_foreign_keys=on
   storage: sqlite3
 appenv: 
   env: development

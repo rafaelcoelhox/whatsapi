@@ -1,0 +1,5 @@
+package whatsapi
+
+func Whatsapi() {
+
+}

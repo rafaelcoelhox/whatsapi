@@ -1,0 +1,20 @@
+```mermaid
+graph LR;
+    A[Project Root] --> B(main.go);
+    A --> C(go.mod);
+    A --> D(go.sum);
+    A --> E(README.md);
+    A --> F(cmd);
+    F --> G(main);
+    G --> H(main.go);
+    A --> I(config);
+    I --> J(config.yaml);
+    A --> K(handlers);
+    K --> L(hello.go);
+    A --> M(models);
+    M --> N(user.go);
+    A --> O(routes);
+    O --> P(routes.go);
+    A --> Q(tests);
+    Q --> R(unit);
+    R --> S(hello_test.go);
