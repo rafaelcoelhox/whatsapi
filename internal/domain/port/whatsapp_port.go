@@ -1,4 +1,4 @@
-package whatisapiInterface
+package port
 
 import "go.mau.fi/whatsmeow"
 

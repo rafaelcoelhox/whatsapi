@@ -33,7 +33,7 @@ func LoadConfig() (*Config, error) {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("../../config")
+	viper.AddConfigPath("internal/config")
 
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("whatsapi")
