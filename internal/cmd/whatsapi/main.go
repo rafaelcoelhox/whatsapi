@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	_ "github.com/mattn/go-sqlite3" // Import SQLite driver
+	_ "github.com/mattn/go-sqlite3" 
 	"go.uber.org/zap"
 	
 	logger "github.com/rafaelhox/whatsapi/helper"
@@ -20,10 +20,9 @@ func main() {
 	
 	log := logger.InitLogger(cfg)
 	defer log.Logger.Sync()
+
+
 	
-
-
-	/*
 	var client .WhatsInterface
 	client, err = adapter.NewWhatsClient(cfg)
 	if err != nil {
@@ -33,7 +32,7 @@ func main() {
 	if err := client.Start(); err != nil {
 		log.Logger.Error("Failed to start client", zap.Error(err))
 	}
-	select {} */
+	select {} 
 
 
 }
