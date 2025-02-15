@@ -35,7 +35,6 @@ func NewWhatsClient(cfg *config.Config) (*WhatsClient, error) {
 	if client == nil {
 		log.Logger.Fatal("Failed to load store", zap.Error(err))
 	}
-
 	return &WhatsClient{client: client}, nil
 }
 

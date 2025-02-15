@@ -5,8 +5,9 @@ import (
 
 	_ "github.com/mattn/go-sqlite3" // Import SQLite driver
 	"go.uber.org/zap"
-
-	logger "github.com/rafaelcoelhox/whatsapi/helper"
+	
+	logger "github.com/rafae
+	lhox/whatsapi/helper"
 	"github.com/rafaelcoelhox/whatsapi/internal/adapter"
 	"github.com/rafaelcoelhox/whatsapi/internal/config"
 	whatisapiInterface "github.com/rafaelcoelhox/whatsapi/internal/interface"
@@ -17,7 +18,7 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("Failed to load config: %v", err))
 	}
-
+	
 	log := logger.InitLogger(cfg)
 	defer log.Logger.Sync()
 

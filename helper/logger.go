@@ -11,7 +11,7 @@ import (
 
 var (
 	globalLogger *Logger
-	once         sync.Once
+	once sync.Once
 )
 
 type Logger struct {
