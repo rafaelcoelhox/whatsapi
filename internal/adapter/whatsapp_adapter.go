@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
 	_ "github.com/mattn/go-sqlite3" // Import the SQLite3 driver
 	"github.com/mdp/qrterminal/v3"
@@ -40,6 +42,7 @@ func NewWhatsClient(cfg *config.Config) (*WhatsClient, error) {
 
 func (c *WhatsClient) Start() error {
 	log := logger.GetLogger()
+	log.Logger.Info("Checling if store is nil")
 	if c.client.Store.ID == nil {
 		channel, err := c.QRChannel()
 		if err != nil {
@@ -50,8 +53,19 @@ func (c *WhatsClient) Start() error {
 		}
 		log.Logger.Info("Waiting for QR code")
 		c.QRCode(channel)
+	} else {
+		log.Logger.Info("Logged User")
+		err := c.client.Connect()
+		if err != nil {
+			log.Logger.Fatal("Failed to connect", zap.Error(err))
+		}
 	}
-	return c.Connect()
+	d := make(chan os.Signal, 1)
+	signal.Notify(d, os.Interrupt, syscall.SIGTERM)
+	<-d
+	c.client.Disconnect()
+
+	return nil
 }
 
 func (c *WhatsClient) Disconnect() {
@@ -69,14 +83,7 @@ func (c *WhatsClient) QRChannel() (<-chan whatsmeow.QRChannelItem, error) {
 func (c *WhatsClient) QRCode(qrChan <-chan whatsmeow.QRChannelItem) string {
 	for evt := range qrChan {
 		if evt.Event == "code" {
-			config := qrterminal.Config{
-				Level:     qrterminal.L, // Reduz a densidade do QR Code
-				Writer:    os.Stdout,
-				BlackChar: qrterminal.BLACK,
-				WhiteChar: qrterminal.WHITE,
-				QuietZone: 0, // Ajuste para melhorar a legibilidade
-			}
-			qrterminal.GenerateWithConfig(evt.Code, config)
+			qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
 			return evt.Code
 		}
 	}
@@ -88,8 +95,6 @@ func (c *WhatsClient) Connect() error {
 	if err := c.client.Connect(); err != nil {
 		log.Logger.Error("Failed to connect", zap.Error(err))
 	}
-	// Listen to Ctrl+C (you can also do something else that prevents the program from exiting)
-
 	return nil
 }
 
