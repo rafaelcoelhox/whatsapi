@@ -3,7 +3,7 @@ package logger
 import (
 	"os"
 	"sync"
-
+	"fmt"
 	"github.com/rafaelcoelhox/whatsapi/internal/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -19,6 +19,7 @@ type Logger struct {
 }
 
 func InitLogger(cfg *config.Config) *Logger {
+	fmt.Println("Initializing logger")
 	once.Do(func() {
 		globalLogger = newLogger(cfg)
 	})
